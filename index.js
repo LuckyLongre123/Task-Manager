@@ -3,99 +3,98 @@ const path = require("path");
 const fs = require("fs");
 const app = express();
 
+const FILES_DIR = path.join(__dirname, "files");
+if (!fs.existsSync(FILES_DIR)) {
+  fs.mkdirSync(FILES_DIR);
+}
+
 app.set("view engine", "ejs");
 app.use(express.static(path.join(__dirname, "public")));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 app.get("/", (req, res) => {
-  fs.readdir("./files", (err, files) => {
-    console.log(files);
-    res.render("index", { files: files });
+  fs.readdir(FILES_DIR, (err, files) => {
+    if (err) {
+      console.log(err);
+      return res.render("index", { files: [] });
+    }
+    res.render("index", { files });
   });
 });
+
 app.post("/create", (req, res) => {
-  console.log(req.body);
-  fs.writeFile(
-    `./files/${req.body.title.split(" ").join("_")}.txt`,
-    req.body.details,
-    (err) => {
-      if (err) {
-        console.log(err);
-        res.redirect("/");
-      } else {
-        res.redirect("/");
-      }
-    }
-  );
+  const title = req.body.title.trim().replace(/\s+/g, "_");
+  const fileName = `${title}.txt`;
+  const filePath = path.join(FILES_DIR, fileName);
+
+  fs.writeFile(filePath, req.body.details, (err) => {
+    if (err) console.log(err);
+    res.redirect("/");
+  });
 });
 
 app.get("/task/:file", (req, res) => {
-  fs.readFile(`./files/${req.params.file}`, "utf-8", (err, data) => {
+  const filePath = path.join(FILES_DIR, req.params.file);
+  fs.readFile(filePath, "utf-8", (err, data) => {
     if (err) {
       console.log(err);
-      res.redirect("/");
-    } else {
-      res.render("tasks", { file: req.params.file, data: data });
+      return res.redirect("/");
     }
+    res.render("tasks", { file: req.params.file, data });
   });
 });
 
 app.get("/edit/:file", (req, res) => {
-  fs.readFile(`./files/${req.params.file}`, "utf-8", (err, data) => {
+  const filePath = path.join(FILES_DIR, req.params.file);
+  fs.readFile(filePath, "utf-8", (err, data) => {
     if (err) {
       console.log(err);
-      res.redirect("/");
-    } else {
-      res.render("edit", { file: req.params.file, data: data });
+      return res.redirect("/");
     }
+    res.render("edit", { file: req.params.file, data });
   });
 });
+
 app.get("/edit/filename/:file", (req, res) => {
   res.render("editFilename", { file: req.params.file });
 });
 
 app.post("/edit/filename", (req, res) => {
-  console.log(req.body);
-  // change file data
-  fs.writeFile(`./files/${req.body.filename}`, req.body.updatedData, (err) => {
+  const oldPath = path.join(FILES_DIR, req.body.filename);
+  const newFileName = req.body.newName?.trim() || req.body.filename;
+  const newPath = path.join(FILES_DIR, newFileName);
+  const updatedData = req.body.updatedData;
+
+  fs.writeFile(oldPath, updatedData, (err) => {
     if (err) {
       console.log(err);
-      res.redirect("/");
-    } else {
-      // rename the file
-      if (!req.body.newName) {
-        res.redirect("/task/" + req.body.filename);
-        return;
-      }
-      fs.rename(
-        `./files/${req.body.filename}`,
-        `./files/${req.body.newName}`,
-        (err) => {
-          if (err) {
-            console.log(err);
-            res.redirect("/");
-          } else {
-            // redirect to the task page with the new name
-            res.redirect("/task/" + req.body.newName);
-          }
+      return res.redirect("/");
+    }
+
+    if (req.body.newName && req.body.newName !== req.body.filename) {
+      fs.rename(oldPath, newPath, (err) => {
+        if (err) {
+          console.log(err);
+          return res.redirect("/");
         }
-      );
+        res.redirect(`/task/${newFileName}`);
+      });
+    } else {
+      res.redirect(`/task/${req.body.filename}`);
     }
   });
 });
 
 app.get("/delete/:file", (req, res) => {
-  fs.unlink(`./files/${req.params.file}`, (err) => {
-    if (err) {
-      console.log(err);
-      res.redirect("/");
-    } else {
-      res.redirect("/");
-    }
+  const filePath = path.join(FILES_DIR, req.params.file);
+  fs.unlink(filePath, (err) => {
+    if (err) console.log(err);
+    res.redirect("/");
   });
 });
 
-app.listen(process.env.PORT || 3000, () => {
-  console.log("Server is running on port http://localhost:3000");
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+  console.log(`✅ Server running at http://localhost:${PORT}`);
 });
