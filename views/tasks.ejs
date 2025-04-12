@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>
+    <%= file.replace(".txt", "" ).split("_").join(" ") %> | Task Manager</title>
+  <script src=" https://cdn.tailwindcss.com">
+  </script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            primary: {
+              50: '#f0f9ff',
+              100: '#e0f2fe',
+              200: '#bae6fd',
+              300: '#7dd3fc',
+              400: '#38bdf8',
+              500: '#0ea5e9',
+              600: '#0284c7',
+              700: '#0369a1',
+              800: '#075985',
+              900: '#0c4a6e',
+            },
+            dark: {
+              700: '#2d2d3a',
+              800: '#1e1e2d',
+              900: '#12121a',
+            }
+          },
+          animation: {
+            'fade-in': 'fadeIn 0.5s ease-out',
+          },
+          keyframes: {
+            fadeIn: {
+              '0%': {
+                opacity: '0',
+                transform: 'translateY(20px)'
+              },
+              '100%': {
+                opacity: '1',
+                transform: 'translateY(0)'
+              },
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <style type="text/tailwindcss">
+    @layer utilities {
+      .text-gradient {
+        @apply bg-clip-text text-transparent bg-gradient-to-r from-primary-400 to-primary-600;
+      }
+      .markdown-content p {
+        @apply mb-4;
+      }
+      .markdown-content ul {
+        @apply list-disc pl-6 mb-4;
+      }
+      .markdown-content ol {
+        @apply list-decimal pl-6 mb-4;
+      }
+    }
+  </style>
+</head>
+
+<body class="w-full min-h-screen bg-dark-900">
+  <div class="container mx-auto px-4 py-12 max-w-4xl animate-fade-in">
+    <div class="bg-dark-800 rounded-xl border border-dark-700 shadow-2xl overflow-hidden">
+      <!-- Task Header -->
+      <div class="bg-gradient-to-r from-dark-700 to-dark-800 border-b border-dark-700 p-6">
+        <div class="flex items-start justify-between">
+          <div>
+            <h1 class="text-3xl font-bold text-white mb-2">
+              <%= file.replace(".txt", "" ).split("_").join(" ") %>
+            </h1>
+          </div>
+          <button class=" text-gray-400 hover:text-white transition-colors">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z" />
+            </svg>
+          </button>
+        </div>
+      </div>
+
+      <div class="p-6">
+        <textarea class="w-full bg-zinc-800 text-gray-300 leading-relaxed p-4 rounded-md border border-zinc-600 focus:outline-none focus:ring-2 focus:ring-blue-500 min-h-[200px]" readonly><%= data %></textarea>
+      </div>
+
+
+      <!-- Task Footer -->
+      <div class="bg-dark-700/50 border-t border-dark-700 p-6 flex justify-between items-center">
+        <a href="/" class="inline-flex items-center gap-2 text-gray-400 hover:text-white transition-colors duration-200">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+            <path fill-rule="evenodd" d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z" clip-rule="evenodd" />
+          </svg>
+          Back to all tasks
+        </a>
+
+        <div class="flex gap-3">
+          <a href="/edit/<%= file %>">
+            <button class="flex items-center gap-2 bg-dark-600 hover:bg-dark-500 text-white px-4 py-2 rounded-lg transition-colors duration-200">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" />
+              </svg>
+              Edit Task
+            </button>
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>
