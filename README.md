@@ -211,12 +211,13 @@ erDiagram
 
 ```mermaid
 stateDiagram-v2
+  direction LR
   [*] --> Created
-  Created: File written to files/<title>.txt
-  Created --> Viewed: GET /task/:file
-  Viewed --> Edited: GET /edit/:file
-  Edited --> Viewed: POST /edit/filename
-  Viewed --> Deleted: GET /delete/:file
+  note right of Created : File written to files/title.txt
+  Created --> Viewed : GET /task/:file
+  Viewed --> Edited : GET /edit/:file
+  Edited --> Viewed : POST /edit/filename
+  Viewed --> Deleted : GET /delete/:file
   Deleted --> [*]
 ```
 
